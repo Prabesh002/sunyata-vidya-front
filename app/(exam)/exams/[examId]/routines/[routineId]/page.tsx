@@ -9,6 +9,9 @@ import ExamSessionForm from "@/src/components/ExamSession/ExamSessionForm";
 import { Reorder } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SessionItem from "@/src/components/ExamSession/SessionItem";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const ExamRoutineDetailsPage = () => {
   const { examId, routineId } = useParams();
@@ -16,6 +19,9 @@ const ExamRoutineDetailsPage = () => {
   const [sessions, setSessions] = useState<ExamSessionListDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [shiftDays, setShiftDays] = useState<number | null>(null)
+  const [shiftError, setShiftError] = useState<string | null>(null);
+  const [shiftSuccess, setShiftSuccess] = useState<string | null>(null);
 
   const fetchRoutineDetails = async () => {
     setLoading(true);
@@ -70,8 +76,8 @@ const ExamRoutineDetailsPage = () => {
     setError(null);
     try {
       await put<ExamSessionListDto, ExamSessionListDto>(
-        API_ENDPOINTS.EXAM_SESSION_BY_ID(id), 
-        updatedSession 
+        API_ENDPOINTS.EXAM_SESSION_BY_ID(id),
+        updatedSession
       );
       await fetchRoutineDetails();
     } catch (error: any) {
@@ -80,8 +86,23 @@ const ExamRoutineDetailsPage = () => {
       setLoading(false);
     }
   };
-  
-  
+
+  const handleShiftRoutine = async () => {
+    setShiftError(null);
+    setShiftSuccess(null);
+
+    if (shiftDays === null) {
+      setShiftError("Please enter a valid number of days to shift.");
+      return;
+    }
+    try {
+      await put(API_ENDPOINTS.EXAM_ROUTINE_SHIFT(routineId as string, shiftDays), {});
+      setShiftSuccess("Routine shifted successfully!");
+      await fetchRoutineDetails();
+    } catch (error: any) {
+      setShiftError(error.message || "Failed to shift routine");
+    }
+  };
 
   if (loading) {
     return (
@@ -130,6 +151,26 @@ const ExamRoutineDetailsPage = () => {
         </CardHeader>
         <CardContent>
           <ExamSessionForm onSubmit={handleCreateSession} />
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Shift Routine</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="shiftDays">Shift Routine by Days:</Label>
+            <Input
+              type="number"
+              id="shiftDays"
+              placeholder="Enter number of days"
+              onChange={(e) => setShiftDays(parseInt(e.target.value))}
+            />
+          </div>
+          <Button onClick={handleShiftRoutine}>Shift Routine</Button>
+          {shiftError && <p className="text-red-500">{shiftError}</p>}
+          {shiftSuccess && <p className="text-green-500">{shiftSuccess}</p>}
         </CardContent>
       </Card>
     </section>
