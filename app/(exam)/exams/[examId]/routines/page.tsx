@@ -48,7 +48,7 @@ const ExamRoutinesPage = () => {
       <ExamRoutineList routines={routines!} examId={examId as string} />
       <div className="mt-8 text-center">
         <Link href={`/exams/${examId}/routines/create`}>
-          <button className="px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all duration-300">
+          <button className="px-6 py-3 text-white bg-black rounded-full hover:bg-gray-900 transition-all duration-300">
             Create New Routine
           </button>
         </Link>
