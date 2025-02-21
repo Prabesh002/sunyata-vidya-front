@@ -19,8 +19,10 @@ const RegisterPage = () => {
     try {
       const response = await post<RegisterResponse, RegisterRequestDto>(API_ENDPOINTS.USER_REGISTER, registrationData); 
       router.push('/login'); 
+      return { success: true };
     } catch (e: any) {
       setError(e.message || 'An unexpected error occurred');
+      return { success: false };
     }
   };
 
