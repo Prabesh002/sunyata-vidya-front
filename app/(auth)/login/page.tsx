@@ -24,7 +24,6 @@ const LoginPage = () => {
 
   return (
     <div>
-      <h1>Login</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <LoginForm onSubmit={handleLogin} />
     </div>

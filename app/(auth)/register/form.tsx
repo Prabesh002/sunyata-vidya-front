@@ -1,93 +1,148 @@
 'use client'
-import { useState } from 'react';
-import { RegisterRequestDto, UserType } from '@/types/auth';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { RegisterRequestDto, UserType } from '@/types/auth'
 
 interface RegisterFormProps {
-  onSubmit: (registrationData: RegisterRequestDto) => void;
+  onSubmit: (registrationData: RegisterRequestDto) => Promise<{ success: boolean; data?: any }>
 }
 
-const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [userType, setUserType] = useState<UserType>(UserType.Student);  //TODO : CHANGE LATER 
-  const [address, setAddress] = useState('');
+const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
+  const router = useRouter()
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    contactNumber: '',
+    userType: UserType.Student,
+    address: ''
+  })
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const registrationData: RegisterRequestDto = {
-      username,
-      email,
-      password,
-      contactNumber,
-      userType,
-      address,
-    };
-    onSubmit(registrationData);
-  };
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }))
+  }
+
+  const handleUserTypeChange = (value: string) => {
+    setFormData(prev => ({ ...prev, userType: parseInt(value) as UserType }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    try {
+      const response = await onSubmit(formData)
+      if (response.success) {
+        router.push('/login')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="username">Username:</label>
-        <input
-          type="text"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="contactNumber">Contact Number:</label>
-        <input
-          type="text"
-          id="contactNumber"
-          value={contactNumber}
-          onChange={(e) => setContactNumber(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="userType">User Type:</label>
-        <select id="userType" value={userType} onChange={(e) => setUserType(parseInt(e.target.value) as UserType)}>
-          <option value={UserType.Student}>Student</option>
-          <option value={UserType.Employee}>Employee</option>
-          <option value={UserType.Parent}>Parent</option>
-        </select>
-      </div>
-      <div>
-        <label htmlFor="address">Address:</label>
-        <input
-          type="text"
-          id="address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-      </div>
-      <button type="submit">Register</button>
-    </form>
-  );
-};
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold tracking-tight">Create an account</CardTitle>
+          <CardDescription>Enter your information to create your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Enter username"
+                  value={formData.username}
+                  onChange={handleChange('username')}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter email"
+                  value={formData.email}
+                  onChange={handleChange('email')}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a password"
+                value={formData.password}
+                onChange={handleChange('password')}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="contactNumber">Contact Number</Label>
+                <Input
+                  id="contactNumber"
+                  type="tel"
+                  placeholder="Enter contact number"
+                  value={formData.contactNumber}
+                  onChange={handleChange('contactNumber')}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="userType">User Type</Label>
+                <Select 
+                  value={formData.userType.toString()} 
+                  onValueChange={handleUserTypeChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={UserType.Student.toString()}>Student</SelectItem>
+                    <SelectItem value={UserType.Employee.toString()}>Employee</SelectItem>
+                    <SelectItem value={UserType.Parent.toString()}>Parent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                type="text"
+                placeholder="Enter address"
+                value={formData.address}
+                onChange={handleChange('address')}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Creating account...' : 'Create account'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
 export default RegisterForm;
