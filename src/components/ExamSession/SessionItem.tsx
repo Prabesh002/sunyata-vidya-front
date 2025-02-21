@@ -10,17 +10,20 @@ interface SessionItemProps {
 const SessionItem = ({ session }: SessionItemProps) => {
   return (
     <motion.div
-      className="bg-gray-100 p-3 rounded-lg shadow-sm cursor-grab"
-      whileHover={{ scale: 1.02 }}
+      className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl cursor-grab transition-all duration-300"
+      whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
     >
       <div className="flex justify-between items-center">
         <div>
-          <p className="font-semibold text-lg">{session.subject}</p>
-          <p className="text-sm text-gray-600">{session.sessionDate}</p>
+          <p className="font-semibold text-xl text-gray-800">{session.subject}</p>
+          <p className="text-sm text-gray-500">{new Date(session.sessionDate).toLocaleString()}</p>
         </div>
-        <div>
-          <p className="text-sm text-gray-500">Order: {session.sequenceOrder}</p>
+        <div className="flex items-center">
+          <p className="text-sm text-gray-500 mr-2">Order:</p>
+          <div className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">
+            {session.sequenceOrder}
+          </div>
         </div>
       </div>
     </motion.div>
