@@ -11,15 +11,11 @@ const LoginPage = () => {
 
   const handleLogin = async (credentials: LoginRequestDto) => {
     try {
-      const response = await post<{ token: string }, LoginRequestDto>('/User/login', credentials);
-
-      if (response.success) {
-        localStorage.setItem('authToken', response.data.token); 
-        setAuthToken(response.data.token);
-        router.push('/(core)'); 
-      } else {
-        setError(response.message || 'Login failed');
-      }
+      const token = await post<string, LoginRequestDto>('/User/login', credentials);
+      console.log(token);
+      localStorage.setItem('authToken', token);
+      setAuthToken(token);
+      router.push('/');
     } catch (e: any) {
       setError(e.message || 'An unexpected error occurred');
     }

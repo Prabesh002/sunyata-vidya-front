@@ -14,7 +14,7 @@ const RegisterPage = () => {
       const response = await post<any, RegisterRequestDto>('/User/register', registrationData);
 
       if (response.success) {
-        router.push('/(auth)/login'); 
+        router.push('/login'); 
       } else {
         setError(response.message || 'Registration failed');
       }
