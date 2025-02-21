@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { useEffect, useState } from "react";
 import { get } from "@/lib/api";
 import { API_ENDPOINTS } from "@/lib/routes";

@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from "@/lib/routes";
 import ExamDetails from "@/src/components/exam/ExamDetails";
 import { Exam } from "@/types/exam";
 import { use } from "react";
+import Link from "next/link";
 
 interface ExamDetailsPageProps {
   params: Promise<{ examId: string }>;
@@ -44,6 +45,12 @@ const ExamDetailsPage = ({ params }: ExamDetailsPageProps) => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-4xl font-semibold text-gray-900 mb-8">Exam Details</h1>
       {exam && <ExamDetails exam={exam} />}
+
+      <div className="mt-6">
+        <Link href={`/exams/${examId}/routines`} className="text-blue-500 hover:underline">
+          View Routines
+        </Link>
+      </div>
     </div>
   );
 };
