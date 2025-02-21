@@ -10,113 +10,130 @@ import { Reorder } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SessionItem from "@/src/components/ExamSession/SessionItem";
 
-
 const ExamRoutineDetailsPage = () => {
-    const { examId, routineId } = useParams();
-    const [routine, setRoutine] = useState<ExamRoutineListDto | null>(null);
-    const [sessions, setSessions] = useState<ExamSessionListDto[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-  
-    const fetchRoutineDetails = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const routineData = await get<ExamRoutineListDto>(API_ENDPOINTS.EXAM_ROUTINE_BY_ID(routineId as string));
-        const sessionsData = await get<ExamSessionListDto[]>(API_ENDPOINTS.EXAM_ROUTINE_SESSION(routineId as string));
-  
-        setRoutine(routineData);
-        setSessions(sessionsData);
-      } catch (error: any) {
-        setError(error.message || "Failed to fetch exam routine details");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    useEffect(() => {
-      fetchRoutineDetails();
-    }, [routineId]);
-  
-    const handleCreateSession = async (data: ExamSessionCreateDto) => {
-      setLoading(true);
-      setError(null);
-      try {
-        await post<ExamSessionListDto, ExamSessionCreateDto>(API_ENDPOINTS.EXAM_ROUTINE_SESSION(routineId as string), data);
-        await fetchRoutineDetails();
-      } catch (error: any) {
-        setError(error.message || "Failed to create exam session");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    const handleReorder = async (newOrder: ExamSessionListDto[]) => {
-      setSessions(newOrder);
-  
-      const updatedSessions: SessionOrder = newOrder.reduce((acc, session, index) => {
-        acc[session.id] = index; 
-        return acc;
-      }, {} as SessionOrder);
-  
-      try {
-        await put(API_ENDPOINTS.EXAM_ROUTINE_REORDER(routineId as string), { sessionOrder: updatedSessions });
-      } catch (error: any) {
-        setError("Failed to update session order");
-      }
-    };
-  
-    if (loading) {
-      return (
-        <section className="flex min-h-screen items-center justify-center">
-          <p className="text-lg text-gray-500">Loading exam routine...</p>
-        </section>
-      );
+  const { examId, routineId } = useParams();
+  const [routine, setRoutine] = useState<ExamRoutineListDto | null>(null);
+  const [sessions, setSessions] = useState<ExamSessionListDto[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchRoutineDetails = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const routineData = await get<ExamRoutineListDto>(API_ENDPOINTS.EXAM_ROUTINE_BY_ID(routineId as string));
+      const sessionsData = await get<ExamSessionListDto[]>(API_ENDPOINTS.EXAM_ROUTINE_SESSION(routineId as string));
+
+      setRoutine(routineData);
+      setSessions(sessionsData);
+    } catch (error: any) {
+      setError(error.message || "Failed to fetch exam routine details");
+    } finally {
+      setLoading(false);
     }
-  
-    if (error) {
-      return (
-        <section className="flex min-h-screen items-center justify-center">
-          <p className="text-lg text-red-500">Error: {error}</p>
-        </section>
-      );
+  };
+
+  useEffect(() => {
+    fetchRoutineDetails();
+  }, [routineId]);
+
+  const handleCreateSession = async (data: ExamSessionCreateDto) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await post<ExamSessionListDto, ExamSessionCreateDto>(API_ENDPOINTS.EXAM_ROUTINE_SESSION(routineId as string), data);
+      await fetchRoutineDetails();
+    } catch (error: any) {
+      setError(error.message || "Failed to create exam session");
+    } finally {
+      setLoading(false);
     }
-  
-    return (
-      <section className="max-w-3xl mx-auto py-10">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Exam Routine Details</CardTitle>
-            <p className="text-gray-500">
-              {routine?.class.className} - {routine?.class.section}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <h3 className="text-lg font-semibold mb-4">Exam Sessions</h3>
-            {sessions.length > 0 ? (
-              <Reorder.Group axis="y" values={sessions} onReorder={handleReorder} className="space-y-2">
-                {sessions.map((session) => (
-                  <Reorder.Item key={session.id} value={session}>
-                    <SessionItem session={session} />
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
-            ) : (
-              <p className="text-gray-500">No exam sessions found for this routine.</p>
-            )}
-          </CardContent>
-        </Card>
-  
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Create New Exam Session</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ExamSessionForm onSubmit={handleCreateSession} />
-          </CardContent>
-        </Card>
-      </section>
-    );
+  };
+
+  const handleReorder = async (newOrder: ExamSessionListDto[]) => {
+    setSessions(newOrder);
+
+    const updatedSessions: SessionOrder = newOrder.reduce((acc, session, index) => {
+      acc[session.id] = index;
+      return acc;
+    }, {} as SessionOrder);
+
+    try {
+      await put(API_ENDPOINTS.EXAM_ROUTINE_REORDER(routineId as string), { sessionOrder: updatedSessions });
+    } catch (error: any) {
+      setError("Failed to update session order");
+    }
+  };
+
+  const handleSaveSession = async (id: string, updatedSession: ExamSessionListDto) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await put<ExamSessionListDto, ExamSessionListDto>(
+        API_ENDPOINTS.EXAM_SESSION_BY_ID(id), 
+        updatedSession 
+      );
+      await fetchRoutineDetails();
+    } catch (error: any) {
+      setError(error.message || "Failed to save session changes");
+    } finally {
+      setLoading(false);
+    }
   };
   
-  export default ExamRoutineDetailsPage;
+  
+
+  if (loading) {
+    return (
+      <section className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-gray-500">Loading exam routine...</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-red-500">Error: {error}</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="max-w-3xl mx-auto py-10">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Exam Routine Details</CardTitle>
+          <p className="text-gray-500">
+            {routine?.class.className} - {routine?.class.section}
+          </p>
+        </CardHeader>
+        <CardContent>
+          <h3 className="text-lg font-semibold mb-4">Exam Sessions</h3>
+          {sessions.length > 0 ? (
+            <Reorder.Group axis="y" values={sessions} onReorder={handleReorder} className="space-y-2">
+              {sessions.map((session) => (
+                <Reorder.Item key={session.id} value={session}>
+                  <SessionItem session={session} onSave={handleSaveSession} />
+                </Reorder.Item>
+              ))}
+            </Reorder.Group>
+          ) : (
+            <p className="text-gray-500">No exam sessions found for this routine.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Create New Exam Session</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ExamSessionForm onSubmit={handleCreateSession} />
+        </CardContent>
+      </Card>
+    </section>
+  );
+};
+
+export default ExamRoutineDetailsPage;
