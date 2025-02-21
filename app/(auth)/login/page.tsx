@@ -4,6 +4,7 @@ import { LoginRequestDto } from '@/types/auth';
 import { post, setAuthToken } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import LoginForm from './form';
+import { API_ENDPOINTS } from '@/lib/routes';
 
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -11,7 +12,7 @@ const LoginPage = () => {
 
   const handleLogin = async (credentials: LoginRequestDto) => {
     try {
-      const token = await post<string, LoginRequestDto>('/User/login', credentials);
+      const token = await post<string, LoginRequestDto>(API_ENDPOINTS.USER_LOGIN, credentials);
       console.log(token);
       localStorage.setItem('authToken', token);
       setAuthToken(token);
