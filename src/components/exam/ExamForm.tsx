@@ -35,14 +35,20 @@ const ExamForm = ({ onSubmit, initialValues, isEditMode }: ExamFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    const utcStartDate = new Date(startDate).toISOString();
+    const utcEndDate = new Date(endDate).toISOString();
+  
     const formData: ExamCreateDto | ExamUpdateDto = {
       examName,
       type,
-      startDate,
-      endDate,
+      startDate: utcStartDate,
+      endDate: utcEndDate,
     };
+  
     await onSubmit(formData);
   };
+  
 
   return (
     <Card className="w-full max-w-lg mx-auto">

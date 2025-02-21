@@ -3,16 +3,13 @@
 import { Exam, ExamUpdateDto, ExamListDto } from "@/types/exam";
 import { get, put } from "@/lib/api";
 import { API_ENDPOINTS } from "@/lib/routes";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import ExamForm from "@/src/components/exam/ExamForm";
 
-interface EditExamPageProps {
-  params: { examId: string };
-}
-
-const EditExamPage = ({ params }: EditExamPageProps) => {
-  const { examId } = params;
+const EditExamPage = () => {
+  const params = useParams();
+  const examId = params.examId as string;
   const router = useRouter();
   const [exam, setExam] = useState<Exam | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -20,9 +17,18 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
 
   useEffect(() => {
     const fetchExamDetails = async () => {
+      if (!examId) return;
       try {
         const examData = await get<Exam>(API_ENDPOINTS.EXAM_BY_ID(examId));
-        setExam(examData);
+
+        const formatDate = (isoString: string) =>
+          new Date(isoString).toISOString().split("T")[0];
+
+        setExam({
+          ...examData,
+          startDate: formatDate(examData.startDate),
+          endDate: formatDate(examData.endDate),
+        });
       } catch (error: any) {
         setError(error.message || "Failed to fetch exam details");
       } finally {
@@ -47,23 +53,25 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <section className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-gray-500">Loading exam details...</p>
+      </section>
+    );
   }
 
   if (!exam) {
-    return <div>Exam not found</div>;
+    return (
+      <section className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-red-500">Exam not found</p>
+      </section>
+    );
   }
 
   return (
-    <div>
-      <h1>Edit Exam</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <ExamForm
-        onSubmit={handleSubmit}
-        initialValues={exam}
-        isEditMode={true}
-      />
-    </div>
+    <section className="flex min-h-screen items-center justify-center">
+      <ExamForm onSubmit={handleSubmit} initialValues={exam} isEditMode={true} />
+    </section>
   );
 };
 
