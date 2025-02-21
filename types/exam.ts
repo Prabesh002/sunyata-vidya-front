@@ -92,3 +92,6 @@ export interface ExamSession {
     sequenceOrder?: number;
     examRoutineId: string;
 }
+export interface SessionOrder {
+  [sessionId: string]: number;
+}
