@@ -2,14 +2,17 @@ export interface StudentCreateDto {
 	name: string;
 	instituteClassId: string;
 	currentSection: string;
-}
-
-export interface StudentUpdateDto {
+  }
+  
+  export interface StudentUpdateDto {
 	name: string;
 	instituteClassId: string;
 	currentSection: string;
-}
-export interface StudentListDto {
+  }
+  
+  export interface StudentListDto {
+	id: string;
 	name: string;
+	instituteClassId: string; 
 	currentSection: string;
-}
+  }
