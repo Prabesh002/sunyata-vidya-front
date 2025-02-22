@@ -9,7 +9,6 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { FaUserGraduate, FaPlus, FaEdit } from "react-icons/fa";
 import StudentSelector from "./StudentSelector";
 
-
 interface StudentFormProps {
     onSubmit: (data: StudentCreateDto | StudentUpdateDto) => Promise<void>;
     initialValues?: StudentCreateDto | StudentUpdateDto;
@@ -53,10 +52,7 @@ const StudentForm = ({ onSubmit, initialValues, isEditMode }: StudentFormProps) 
                                 className="focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="instituteClass">Institute Class</Label>
-                            <StudentSelector setValue={setInstituteClassId}/>
-                        </div>
+                        <StudentSelector setValue={setInstituteClassId} />
                         <div className="space-y-2">
                             <Label htmlFor="currentSection">Current Section</Label>
                             <Input

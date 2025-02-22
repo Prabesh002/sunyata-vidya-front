@@ -18,6 +18,7 @@ const CreateStudentPage = () => {
     setError(null);
     try {
       const response = await post<StudentListDto, StudentCreateDto>(API_ENDPOINTS.STUDENT_CREATE, data);
+      console.log(data);
       router.push(`/student/${response.id}`);
     } catch (error: any) {
       setError(error.message || "Failed to create student");
