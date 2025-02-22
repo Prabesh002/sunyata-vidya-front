@@ -27,10 +27,7 @@ const CreateExamPage = () => {
 
   return (
     <div>
-      <h1>Create Exam</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
       <ExamForm onSubmit={handleSubmit} />
-      {loading && <p>Creating exam...</p>}
     </div>
   );
 };
