@@ -54,7 +54,6 @@ const InstituteClassPage = () => {
     <div
       style={{
         padding: "20px",
-        fontFamily: "Arial, sans-serif",
         maxWidth: "1200px",
         margin: "0 auto",
         textAlign: "center",
