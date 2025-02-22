@@ -5,6 +5,7 @@ import { get } from "@/lib/api";
 import { API_ENDPOINTS } from "@/lib/routes";
 import ExamList from "@/src/components/exam/ExamList";
 import { ExamListDto } from "@/types/exam";
+import Loader from "@/src/UI/Loading";
 
 const ExamsPage = () => {
   const [exams, setExams] = useState<ExamListDto[] | null>(null);
@@ -26,7 +27,7 @@ const ExamsPage = () => {
   }, []); 
 
   if (loading) {
-    return <div>Loading...</div>;
+    return  <Loader></Loader>
   }
 
   return (

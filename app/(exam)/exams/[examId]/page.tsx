@@ -7,6 +7,7 @@ import ExamDetails from "@/src/components/exam/ExamDetails";
 import { Exam } from "@/types/exam";
 import { use } from "react";
 import Link from "next/link";
+import Loader from "@/src/UI/Loading";
 
 interface ExamDetailsPageProps {
   params: Promise<{ examId: string }>;
@@ -35,9 +36,7 @@ const ExamDetailsPage = ({ params }: ExamDetailsPageProps) => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-xl text-gray-500">Loading exam details...</p>
-      </div>
+       <Loader></Loader>
     );
   }
 

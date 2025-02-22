@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from "@/lib/routes";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import ExamForm from "@/src/components/exam/ExamForm";
+import Loader from "@/src/UI/Loading";
 
 const EditExamPage = () => {
   const params = useParams();
@@ -54,9 +55,7 @@ const EditExamPage = () => {
 
   if (loading) {
     return (
-      <section className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-gray-500">Loading exam details...</p>
-      </section>
+       <Loader></Loader>
     );
   }
 
