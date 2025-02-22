@@ -1,3 +1,5 @@
+import { StringToBoolean } from "class-variance-authority/types";
+
 export enum ExamType {
   Test = 0,
   Terminal = 1,
@@ -29,6 +31,8 @@ export interface ExamListDto {
   type: ExamType;
   startDate: string;
   endDate: string;   
+  createdAt : string;
+  updatedAt : string;
 }
 
 export interface ExamRoutineCreateDto {
@@ -91,4 +95,7 @@ export interface ExamSession {
     subject: string;
     sequenceOrder?: number;
     examRoutineId: string;
+}
+export interface SessionOrder {
+  [sessionId: string]: number;
 }

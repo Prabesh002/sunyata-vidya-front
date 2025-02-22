@@ -1,17 +1,20 @@
-"use client"
+"use client";
+
 import { useEffect, useState } from "react";
 import { get } from "@/lib/api";
 import { API_ENDPOINTS } from "@/lib/routes";
 import ExamDetails from "@/src/components/exam/ExamDetails";
 import { Exam } from "@/types/exam";
-import { use } from "react"; 
+import { use } from "react";
+import Link from "next/link";
+import Loader from "@/src/UI/Loading";
 
 interface ExamDetailsPageProps {
   params: Promise<{ examId: string }>;
 }
 
 const ExamDetailsPage = ({ params }: ExamDetailsPageProps) => {
-  const { examId } = use(params); 
+  const { examId } = use(params);
 
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,16 +32,24 @@ const ExamDetailsPage = ({ params }: ExamDetailsPageProps) => {
     };
 
     fetchExamDetails();
-  }, [examId]); 
+  }, [examId]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+       <Loader></Loader>
+    );
   }
 
   return (
-    <div>
-      <h1>Exam Details</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <h1 className="text-4xl font-semibold text-gray-900 mb-8">Exam Details</h1>
       {exam && <ExamDetails exam={exam} />}
+
+      <div className="mt-6">
+        <Link href={`/exams/${examId}/routines`} className="text-blue-500 hover:underline">
+          View Routines
+        </Link>
+      </div>
     </div>
   );
 };

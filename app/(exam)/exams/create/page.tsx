@@ -17,7 +17,7 @@ const CreateExamPage = () => {
     setError(null);
     try {
       const response = await post<ExamListDto, ExamCreateDto>(API_ENDPOINTS.EXAM, data);
-      router.push(`/exams/${response.id}`); // Redirect to the exam details page after successful creation
+      router.push(`/exams/${response.id}`);
     } catch (error: any) {
       setError(error.message || "Failed to create exam");
     } finally {
@@ -26,9 +26,9 @@ const CreateExamPage = () => {
   };
 
   return (
-    <div>
+    <section className="flex min-h-screen items-center justify-center">
       <ExamForm onSubmit={handleSubmit} />
-    </div>
+    </section>
   );
 };
 
