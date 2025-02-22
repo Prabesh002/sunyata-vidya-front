@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import Link from 'next/link' 
 
 interface LoginFormProps {
-  onSubmit: (credentials: { username: string; password: string }) => void;
+  onSubmit: (credentials: { username: string; password: string }) => Promise<void>; 
 }
 
 const LoginPage = ({ onSubmit }: LoginFormProps) => {
@@ -57,14 +58,20 @@ const LoginPage = ({ onSubmit }: LoginFormProps) => {
                 className="w-full"
               />
             </div>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full"
               disabled={isLoading}
             >
-              Sign In
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
+          <div className="mt-4 text-center text-sm">
+            No account?{' '}
+            <Link href="/register" className="text-primary underline">
+              Sign up
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

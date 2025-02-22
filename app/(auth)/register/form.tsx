@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { RegisterRequestDto, UserType } from '@/types/auth'
+import Link from 'next/link' 
 
 interface RegisterFormProps {
   onSubmit: (registrationData: RegisterRequestDto) => Promise<{ success: boolean; data?: any }>
@@ -104,8 +105,8 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="userType">User Type</Label>
-                <Select 
-                  value={formData.userType.toString()} 
+                <Select
+                  value={formData.userType.toString()}
                   onValueChange={handleUserTypeChange}
                 >
                   <SelectTrigger>
@@ -139,10 +140,16 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               {isLoading ? 'Creating account...' : 'Create account'}
             </Button>
           </form>
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{' '}
+            <Link href="/login" className="text-primary underline">
+              Login
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
   )
 }
 
-export default RegisterForm;
+export default RegisterForm
