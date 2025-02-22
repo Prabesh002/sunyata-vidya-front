@@ -32,7 +32,7 @@ const ExamSessionForm = ({ onSubmit }: ExamSessionFormProps) => {
         <Label htmlFor="sessionDate">Session Date</Label>
         <Input
           id="sessionDate"
-          type="date"  // Date only input
+          type="date"  
           value={sessionDate}
           onChange={(e) => setSessionDate(e.target.value)}
           required

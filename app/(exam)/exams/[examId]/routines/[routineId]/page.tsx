@@ -12,6 +12,8 @@ import SessionItem from "@/src/components/ExamSession/SessionItem";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import Loader from "@/src/UI/Loading";
 
 const ExamRoutineDetailsPage = () => {
   const { examId, routineId } = useParams();
@@ -19,7 +21,7 @@ const ExamRoutineDetailsPage = () => {
   const [sessions, setSessions] = useState<ExamSessionListDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [shiftDays, setShiftDays] = useState<number | null>(null)
+  const [shiftDays, setShiftDays] = useState<number | null>(null);
   const [shiftError, setShiftError] = useState<string | null>(null);
   const [shiftSuccess, setShiftSuccess] = useState<string | null>(null);
 
@@ -29,9 +31,14 @@ const ExamRoutineDetailsPage = () => {
     try {
       const routineData = await get<ExamRoutineListDto>(API_ENDPOINTS.EXAM_ROUTINE_BY_ID(routineId as string));
       const sessionsData = await get<ExamSessionListDto[]>(API_ENDPOINTS.EXAM_ROUTINE_SESSION(routineId as string));
+      
+      // Sort sessions by sequenceOrder
+      const sortedSessions = [...sessionsData].sort((a, b) => 
+        (a.sequenceOrder ?? 0) - (b.sequenceOrder ?? 0)
+      );
 
       setRoutine(routineData);
-      setSessions(sessionsData);
+      setSessions(sortedSessions);
     } catch (error: any) {
       setError(error.message || "Failed to fetch exam routine details");
     } finally {
@@ -47,7 +54,10 @@ const ExamRoutineDetailsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      await post<ExamSessionListDto, ExamSessionCreateDto>(API_ENDPOINTS.EXAM_ROUTINE_SESSION(routineId as string), data);
+      await post<ExamSessionListDto, ExamSessionCreateDto>(
+        API_ENDPOINTS.EXAM_ROUTINE_SESSION(routineId as string),
+        data
+      );
       await fetchRoutineDetails();
     } catch (error: any) {
       setError(error.message || "Failed to create exam session");
@@ -65,7 +75,9 @@ const ExamRoutineDetailsPage = () => {
     }, {} as SessionOrder);
 
     try {
-      await put(API_ENDPOINTS.EXAM_ROUTINE_REORDER(routineId as string), { sessionOrder: updatedSessions });
+      await put(API_ENDPOINTS.EXAM_ROUTINE_REORDER(routineId as string), {
+        sessionOrder: updatedSessions,
+      });
     } catch (error: any) {
       setError("Failed to update session order");
     }
@@ -106,74 +118,103 @@ const ExamRoutineDetailsPage = () => {
 
   if (loading) {
     return (
-      <section className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-gray-500">Loading exam routine...</p>
-      </section>
+      <Loader></Loader>
     );
   }
 
   if (error) {
     return (
-      <section className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-red-500">Error: {error}</p>
-      </section>
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg font-medium text-red-500">Error</p>
+          <p className="mt-1 text-sm text-gray-500">{error}</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <section className="max-w-3xl mx-auto py-10">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Exam Routine Details</CardTitle>
-          <p className="text-gray-500">
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Exam Routine Details</h1>
+          <p className="mt-1 text-sm text-gray-500">
             {routine?.class.className} - {routine?.class.section}
           </p>
-        </CardHeader>
-        <CardContent>
-          <h3 className="text-lg font-semibold mb-4">Exam Sessions</h3>
-          {sessions.length > 0 ? (
-            <Reorder.Group axis="y" values={sessions} onReorder={handleReorder} className="space-y-2">
-              {sessions.map((session) => (
-                <Reorder.Item key={session.id} value={session}>
-                  <SessionItem session={session} onSave={handleSaveSession} />
-                </Reorder.Item>
-              ))}
-            </Reorder.Group>
-          ) : (
-            <p className="text-gray-500">No exam sessions found for this routine.</p>
-          )}
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Create New Exam Session</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ExamSessionForm onSubmit={handleCreateSession} />
-        </CardContent>
-      </Card>
+        <div className="space-y-6">
 
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Shift Routine</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="shiftDays">Shift Routine by Days:</Label>
-            <Input
-              type="number"
-              id="shiftDays"
-              placeholder="Enter number of days"
-              onChange={(e) => setShiftDays(parseInt(e.target.value))}
-            />
-          </div>
-          <Button onClick={handleShiftRoutine}>Shift Routine</Button>
-          {shiftError && <p className="text-red-500">{shiftError}</p>}
-          {shiftSuccess && <p className="text-green-500">{shiftSuccess}</p>}
-        </CardContent>
-      </Card>
-    </section>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Exam Sessions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {sessions.length > 0 ? (
+                <Reorder.Group
+                  axis="y"
+                  values={sessions}
+                  onReorder={handleReorder}
+                  className="space-y-4"
+                >
+                  {sessions.map((session) => (
+                    <Reorder.Item
+                      key={session.id}
+                      value={session}
+                      className="touch-manipulation"
+                    >
+                      <SessionItem session={session} onSave={handleSaveSession} />
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No exam sessions found for this routine.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Create New Exam Session</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ExamSessionForm onSubmit={handleCreateSession} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Shift Routine</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="shiftDays">Number of Days</Label>
+                  <Input
+                    type="number"
+                    id="shiftDays"
+                    placeholder="Enter number of days"
+                    className="max-w-xs"
+                    onChange={(e) => setShiftDays(parseInt(e.target.value))}
+                  />
+                </div>
+                <Button onClick={handleShiftRoutine}>Shift Routine</Button>
+                {shiftError && (
+                  <p className="text-sm text-red-500">{shiftError}</p>
+                )}
+                {shiftSuccess && (
+                  <p className="text-sm text-green-500">{shiftSuccess}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 };
 
