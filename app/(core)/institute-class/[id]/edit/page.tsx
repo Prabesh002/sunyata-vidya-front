@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import InstituteClassForm from "@/src/components/institute-class/InstituteClassForm";
+import Loader from "@/src/UI/Loading";
 
 const EditInstituteClassPage = () => {
   const params = useParams();
@@ -18,7 +19,7 @@ const EditInstituteClassPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (!id) return; 
+    if (!id) return;
     const fetchInstituteClassDetails = async () => {
       setLoading(true);
       setError(null);
@@ -42,7 +43,7 @@ const EditInstituteClassPage = () => {
     setError(null);
     try {
       await put<InstituteClassListDto, InstituteClassUpdateDto>(API_ENDPOINTS.INSTITUTE_CLASS_BY_ID(id), data);
-      router.push(`/institute-class/${id}`); 
+      router.push(`/institute-class/${id}`);
     } catch (error: any) {
       setError(error.message || "Failed to update institute class");
     } finally {
@@ -51,17 +52,61 @@ const EditInstituteClassPage = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center mt-10">
+        <Loader />
+      </div>
+    );
   }
 
   if (!instituteClass) {
-    return <div>Institute class not found</div>;
+    return (
+      <div
+        style={{
+          padding: "20px",
+          maxWidth: "800px",
+          margin: "0 auto",
+          fontFamily: "Arial, sans-serif",
+          textAlign: "center",
+        }}
+      >
+        <h1 style={{ fontSize: "32px", marginBottom: "20px" }}>Institute Class Not Found</h1>
+        <p style={{ color: "gray", fontSize: "18px" }}>
+          We couldn't find the class you're looking for. Please try again later.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Edit Institute Class</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "800px",
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ fontSize: "32px", marginBottom: "20px" }}>Edit Institute Class</h1>
+
+      {/* Error Message */}
+      {error && (
+        <div
+          style={{
+            color: "red",
+            padding: "10px",
+            border: "2px solid red",
+            borderRadius: "8px",
+            marginBottom: "20px",
+            backgroundColor: "#fff3f3",
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      {/* Form to Edit Institute Class */}
       <InstituteClassForm
         onSubmit={handleSubmit}
         initialValues={instituteClass}
